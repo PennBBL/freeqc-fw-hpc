@@ -7,7 +7,7 @@ INPUT_DIR=$FLYWHEEL_BASE/input
 GEAR_OUTPUT_DIR=$FLYWHEEL_BASE/output
 FQC_OUTPUT_DIR=$GEAR_OUTPUT_DIR/"$ANALYSIS_ID"
 WORKING_DIR=$GEAR_OUTPUT_DIR/"$ANALYSIS_ID"_work
-BIDS_DIR=$GEAR_OUTPUT_DIR/bids_dataset
+#BIDS_DIR=$GEAR_OUTPUT_DIR/bids_dataset
 #EXE_SCRIPT=$GEAR_OUTPUT_DIR/fqc_run.sh
 CONTAINER='[flywheel/freesurfer-quality-calc]'
 
@@ -40,9 +40,9 @@ echo -e "$CONTAINER END FQC DOCKERFILE \n"
 ####### fMRIPrep outputs that pass QA #######
 # QA: Prior manual + Euler-based inspection for unchecked images
 # bblid,seslabel,cnr_graycsf_lh,cnr_graycsf_rh,cnr_graywhite_lh,cnr_graywhite_rh,euler_lh,euler_rh
-InDir=/flywheel/v0/input/freesurfer
+InDir=${INPUT_DIR}/freesurfer
 #~/Documents/flywheel/antssstbids_fw_debug/5ea767e021d44102f5600847/freesurfer
-OutDir=/flywheel/v0/output/data
+OutDir=${OUTPUT_DIR}/data
 #~/Documents/flywheel/freesurfer-quality-calc_fw_debug/output/data
 mkdir ${OutDir}
 subj=`ls -d ${InDir}/sub* | sed 's#.*/##'`
