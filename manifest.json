@@ -28,14 +28,14 @@
 		}
 	},
 	"config": {
-		"save_outputs": {
+		"save_partial_outputs": {
 			"description": "Zip and save output directory contents on an algorithm failure. [default=false]",
 			"type": "boolean",
 			"default": false
 		},
-		"session": {
+		"session_label": {
 				"default": "",
-				"description": " task session ",
+				"description": " session label ",
 				"type": "string"
 			}
 		}

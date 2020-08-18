@@ -29,6 +29,7 @@ function parse_config {
 }
 
 config_save_outputs="$(parse_config 'save_partial_outputs')"
+config_session_label="$(parse_config 'session_label')"
 
 echo -e "$CONTAINER BEGIN FQC DOCKERFILE\n"
 cat ${FLYWHEEL_BASE}/*Dockerfile
@@ -49,7 +50,7 @@ OutDir=${OUTPUT_DIR}/data
 mkdir ${OutDir}
 subj=`ls -d ${InDir}/sub* | sed 's#.*/##'`
 bblid=`echo ${subj} | cut -d "-" -f 2`
-seslabel=#### NEED TO FIGURE THIS OUT ####
+seslabel=`echo ${config_session_label} | cut -d "-" -f 2`
 surfDir=${InDir}/${subj}/surf ### MIGHT HAVE TO GIT RID OF DIRS BETWEEN INPUT AND FREESURFER
 mriDir=${InDir}/${subj}/mri
 
