@@ -19,5 +19,25 @@
 		"api_key": {
 			"base": "api-key"
 		}
-	}
+	},
+	"inputs": {
+		"fmriprepdir": {
+			"base": "file",
+			"description": "FMRIprep output directory",
+			"optional": false
+		}
+	},
+	"config": {
+		"save_outputs": {
+			"description": "Zip and save output directory contents on an algorithm failure. [default=false]",
+			"type": "boolean",
+			"default": false
+		},
+		"session": {
+				"default": "",
+				"description": " task session ",
+				"type": "string"
+			}
+		}
+  }
 }

@@ -28,6 +28,8 @@ function parse_config {
   fi
 }
 
+config_save_outputs="$(parse_config 'save_partial_outputs')"
+
 echo -e "$CONTAINER BEGIN FQC DOCKERFILE\n"
 cat ${FLYWHEEL_BASE}/*Dockerfile
 echo -e "$CONTAINER END FQC DOCKERFILE \n"
@@ -87,11 +89,6 @@ if [[ $FQC_EXITSTATUS == 0 ]] ; then ### Some other check of outputs
   echo "$CONTAINER  generating zip archive from outputs..."
   time zip -q -r "$GEAR_OUTPUT_DIR"/fqc_"$SUB_ID"_"$ANALYSIS_ID" $(basename "$FQC_OUTPUT_DIR")
 
-  #if [[ $config_save_intermediate_work == 'true' ]] ; then
-  #  echo "$CONTAINER  generating zip archive from intermediate work files..."
-  #  cd "$GEAR_OUTPUT_DIR"
-  #  time zip -q -r "$GEAR_OUTPUT_DIR"/fqc_work_"$SUB_ID"_"$ANALYSIS_ID" $(basename "$WORKING_DIR")
-  #fi
   chmod -R 777 $GEAR_OUTPUT_DIR
 
 elif [[ $config_save_outputs == 'true' ]] ; then
