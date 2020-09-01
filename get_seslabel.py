@@ -6,9 +6,14 @@
 
 import flywheel
 import os
+import json
 
-fw = flywheel.Client()
-project = fw.projects.find_first("label=ExtraLong")
+# Parse config.json to get the API key
+config_file = json.load(open('/flywheel/v0/config.json'))
+api_key = config_file['inputs']['api_key']['key']
+
+fw = flywheel.Client(api_key)
+project = fw.projects.find_first('label=ExtraLong')
 
 # Get the analysis ID for the fmriprep run
 fmriprep_input = os.listdir('/flywheel/v0/input/fmriprepdir/')

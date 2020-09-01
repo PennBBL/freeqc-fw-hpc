@@ -73,8 +73,8 @@ RUN conda install -y python=3.7.1 \
 
 ############################
 # Install the Flywheel SDK
-RUN pip install 'flywheel-sdk==11.*'
-RUN pip install heudiconv validators
+#RUN pip install 'flywheel-sdk==11.*'
+#RUN pip install heudiconv validators
 
 
 ############################
