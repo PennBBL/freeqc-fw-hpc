@@ -6,15 +6,46 @@ from zipfile import ZipFile
 from unittest import mock
 import argparse
 from pathlib import PosixPath
-from fw_heudiconv.cli import export
+#from fw_heudiconv.cli import export # Q: Do I need a copy of fwheudiconv in my freeqc-fw-hpc directory
 import flywheel
-from qsiprep.cli import run as qsiprep_run
+#from qsiprep.cli import run as qsiprep_run
 from glob import glob
 
 # logging stuff
 logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger('qsiprep-gear')
-logger.info("=======: antssstbids :=======")
+logger = logging.getLogger('freeqc-gear')
+logger.info("=======: freeqc :=======")
+
+context = flywheel.GearContext()
+config = context.config
+
+## Load in values from the gear configuration
+save_partial_outputs = config['save_partial_outputs']
+session_label = config['session_label']
+
+## Load in paths to input files for the gear.
+fmriprepdir = context.get_input_path('fmriprepdir')
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 # Gather variables that will be shared across functions
@@ -31,7 +62,7 @@ with flywheel.GearContext() as context:
     output_space = config.get('output_space', '').split()
     analysis_id = context.destination['id']
     gear_output_dir = PosixPath(context.output_dir)
-    antssstbids_script = gear_output_dir / "antssstbids_run.sh"
+    freeqc_script = gear_output_dir / "run.sh"
     output_root = gear_output_dir / analysis_id
     working_dir = PosixPath(str(output_root.resolve()) + "_work")
     bids_dir = output_root
@@ -47,25 +78,23 @@ with flywheel.GearContext() as context:
     extra_t1 = context.get_input('t1_anatomy')
     extra_t1_path = None if extra_t1 is None else \
         PosixPath(context.get_input_path('t1_anatomy'))
-    extra_t2 = context.get_input('t2_anatomy')
-    extra_t2_path = None if extra_t2 is None else \
-        PosixPath(context.get_input_path('t2_anatomy'))
     use_all_sessions = config.get('use_all_sessions', False)
 
     # output zips
-    #html_zipfile = gear_output_dir / (analysis_id + "_antssstbids_html.zip")
-    derivatives_zipfile = gear_output_dir / (analysis_id + "_antssstbids_derivatives.zip")
+    #html_zipfile = gear_output_dir / (analysis_id + "_freeqc_html.zip")
+    derivatives_zipfile = gear_output_dir / (analysis_id + "_freeqc_derivatives.zip")
     #debug_derivatives_zipfile = gear_output_dir / (
-    #    analysis_id + "_debug_antssstbids_derivatives.zip") # Probably won't exist
-    working_dir_zipfile = gear_output_dir / (analysis_id + "_antssstbids_workdir.zip")
-    errorlog_zipfile = gear_output_dir / (analysis_id + "_antssstbids_errorlog.zip")
+    #    analysis_id + "_debug_freeqc_derivatives.zip") # Probably won't exist
+    working_dir_zipfile = gear_output_dir / (analysis_id + "_freeqc_workdir.zip")
+    errorlog_zipfile = gear_output_dir / (analysis_id + "_freeqc_errorlog.zip")
 
-
-def write_antssstbids_command():
+# August 19, 2020: I think this whole function is obsolete, since the entire
+# pipeline is in the run script
+def write_freeqc_command():
     """Create a command script."""
     with flywheel.GearContext() as context:
         cmd = [
-            '/usr/local/miniconda/bin/antssstbids',
+            '/usr/local/miniconda/bin/freeqc',
             str(bids_root),
             str(output_root),
             'participant',
@@ -185,11 +214,11 @@ def main():
         logger.warning("Critical error while trying to download BIDS data.")
         return 1
 
-    command_ok = write_antssstbids_command()
+    command_ok = write_freeqc_command()
     sys.stdout.flush()
     sys.stderr.flush()
     if not command_ok:
-        logger.warning("Critical error while trying to write antssstbids command.")
+        logger.warning("Critical error while trying to write freeqc command.")
         return 1
 
     return 0

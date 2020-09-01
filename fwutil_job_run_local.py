@@ -138,7 +138,7 @@ if __name__ == '__main__':
     if fw.get_current_user().root:
         fw = flywheel.Client(api_key, root=True)
     else:
-        raise ValueError('This process requires site-admin priviliges!')
+        raise ValueError('This process requires site-admin privileges!')
 
     # Get the job
     job = fw.get_job(sys.argv[2])

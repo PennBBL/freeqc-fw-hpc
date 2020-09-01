@@ -1,26 +1,24 @@
 {
-	"name": "freesurfer-quality-calc",
-	"label": "freesurfer-quality-calc: ",
+	"name": "freeqc-fw-hpc",
+	"label": "freeqc-fw-hpc: ",
 	"description": "Calculate surface holes and CNR using freesurfer output from fMRIPrep [CUBIC]",
 	"version": "latest",
   "custom": {
 		"gear-builder": {
 			"category": "analysis",
-			"image": "pennbbl/freesurfer-quality-calc"
+			"image": "pennbbl/freeqc-fw-hpc"
 		},
-    "flywheel":{"suite": "PennBBL"}
+    "flywheel": {"suite": "PennBBL"}
   },
 	"author": "Ellyn Butler",
 	"maintainer": "Ellyn Butler",
-	"cite": "github.com/pennbbl/freesurfer-quality-calc",
+	"cite": "github.com/pennbbl/freeqc-fw-hpc",
 	"license": "BSD-3-Clause",
-	"source": "https://github.com/PennBBL/freesurfer-quality-calc",
+	"source": "https://github.com/PennBBL/freeqc-fw-hpc",
 	"inputs": {
 		"api_key": {
 			"base": "api-key"
-		}
-	},
-	"inputs": {
+		},
 		"fmriprepdir": {
 			"base": "file",
 			"description": "FMRIprep output directory",
@@ -32,12 +30,6 @@
 			"description": "Zip and save output directory contents on an algorithm failure. [default=false]",
 			"type": "boolean",
 			"default": false
-		},
-		"session_label": {
-				"default": "",
-				"description": " session label ",
-				"type": "string"
-			}
 		}
-  }
+	}
 }

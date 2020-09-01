@@ -14,7 +14,7 @@ RUN apt-get update && apt-get -y install \
     zip \
     build-essential
 
-COPY docker/files/neurodebian.gpg /usr/local/etc/neurodebian.gpg
+#COPY docker/files/neurodebian.gpg /usr/local/etc/neurodebian.gpg
 
 # Prepare environment
 RUN apt-get update && \
@@ -32,6 +32,14 @@ RUN apt-get update && \
     apt-get install -y --no-install-recommends \
                     nodejs && \
     apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+RUN curl -sSLO https://repo.continuum.io/miniconda/Miniconda3-4.5.11-Linux-x86_64.sh && \
+    bash Miniconda3-4.5.11-Linux-x86_64.sh -b -p /usr/local/miniconda && \
+    rm Miniconda3-4.5.11-Linux-x86_64.sh
+
+ENV PATH=/usr/local/miniconda/bin:$PATH \
+    LANG=C.UTF-8 \
+    LC_ALL=C.UTF-8 \
+    PYTHONNOUSERSITE=1
 
 # Installing freesurfer
 RUN curl -sSL https://surfer.nmr.mgh.harvard.edu/pub/dist/freesurfer/6.0.1/freesurfer-Linux-centos6_x86_64-stable-pub-v6.0.1.tar.gz | tar zxv --no-same-owner -C /opt \
@@ -75,21 +83,21 @@ ENV FLYWHEEL /flywheel/v0
 RUN mkdir -p ${FLYWHEEL}
 COPY run ${FLYWHEEL}/run
 COPY manifest.json ${FLYWHEEL}/manifest.json
-COPY fs_license.py /flywheel/v0/fs_license.py
+#COPY fs_license.py /flywheel/v0/fs_license.py
 
 # Set the entrypoint
 ENTRYPOINT ["/flywheel/v0/run"]
 
 # Add the fmriprep dockerfile to the container
-ADD https://raw.githubusercontent.com/poldracklab/fmriprep/${FMRIPREP_VERSION}/Dockerfile ${FLYWHEEL}/fmriprep_${FMRIPREP_VERSION}_Dockerfile
+#ADD https://raw.githubusercontent.com/poldracklab/fmriprep/${FMRIPREP_VERSION}/Dockerfile ${FLYWHEEL}/fmriprep_${FMRIPREP_VERSION}_Dockerfile
 
 
 ############################
 # Copy over python scripts that generate the BIDS hierarchy
-COPY prepare_run.py /flywheel/v0/prepare_run.py
-COPY create_archive_fw_heudiconv.py /flywheel/v0/create_archive_fw_heudiconv.py
+COPY prepare_run.py /flywheel/v0/prepare_run.py # August 19, 2020: This is probably obsolete, since the entire pipeline is in the run script
+#COPY create_archive_fw_heudiconv.py /flywheel/v0/create_archive_fw_heudiconv.py
 COPY move_to_project.py /flywheel/v0/move_to_project.py
-COPY download_freesurfer_output.py /flywheel/v0/download_freesurfer_output
+#COPY download_freesurfer_output.py /flywheel/v0/download_freesurfer_output
 RUN chmod +x ${FLYWHEEL}/*
 
 RUN pip install fw-heudiconv -U
