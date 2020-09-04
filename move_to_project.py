@@ -16,7 +16,7 @@ if outputs:
     inputs = invocation['inputs']
     destination = invocation['destination']
 
-    fw = flywheel.Flywheel(inputs['api_key']['key'])
+    fw = flywheel.Client(inputs['api_key']['key']) #Used to be flywheel.Flywheel
     user = fw.get_current_user()
 
     # start up logic:

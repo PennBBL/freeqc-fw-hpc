@@ -4,6 +4,7 @@ FROM ubuntu:xenial-20200114
 
 MAINTAINER Ellyn Butler <ellyn.butler@pennmedicine.upenn.edu>
 ENV FREESURFER_VERSION 6.0.1
+ENV FREESURFER_HOME /opt/freesurfer
 
 
 ############################
@@ -62,7 +63,7 @@ RUN curl -sSL https://surfer.nmr.mgh.harvard.edu/pub/dist/freesurfer/6.0.1/frees
     --exclude='freesurfer/subjects/V1_average' \
     --exclude='freesurfer/trctrain'
 
-# Installing precomputed python packages
+# Installing precomputed python packages # September 3, 2020: Ending up with pip v 10.1.1
 RUN conda install -y python=3.7.1 \
                       pip=19.1 \
     chmod -R a+rX /usr/local/miniconda; sync && \
@@ -75,6 +76,8 @@ RUN conda install -y python=3.7.1 \
 # Install the Flywheel SDK
 #RUN pip install 'flywheel-sdk==11.*'
 #RUN pip install heudiconv validators
+#RUN pip-2.7 install csv
+# September 4, 2020: csv is a module that should be automatically included with the python installation
 
 
 ############################
@@ -98,7 +101,8 @@ ENTRYPOINT ["/flywheel/v0/run"]
 #COPY create_archive_fw_heudiconv.py /flywheel/v0/create_archive_fw_heudiconv.py
 COPY move_to_project.py /flywheel/v0/move_to_project.py
 COPY get_seslabel.py /flywheel/v0/get_seslabel.py
-#COPY download_freesurfer_output.py /flywheel/v0/download_freesurfer_output
+#COPY download_freesurfer_output.py /flywheel/v0/download_freesurfer_output.py
+COPY stats2table_bash.sh /flywheel/v0/stats2table_bash.sh
 RUN chmod +x ${FLYWHEEL}/*
 
 RUN pip install fw-heudiconv -U
