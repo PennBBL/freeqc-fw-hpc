@@ -47,6 +47,7 @@ unzip ${INPUT_DIR}/fmriprepdir/*.zip
 ##################### PROCESSING STEPS #####################
 #############################################################
 
+mv ${FLYWHEEL_BASE}/license.txt ${FREESURFER_HOME}/
 export SUBJECTS_DIR=$FREESURFER_HOME/subjects
 FUNCTIONALS_DIR=$FREESURFER_HOME/sessions
 source $FREESURFER_HOME/FreeSurferEnv.sh
@@ -66,7 +67,8 @@ surfDir=${InDir}/${subj}/surf ### MIGHT HAVE TO GIT RID OF DIRS BETWEEN INPUT AN
 mriDir=${InDir}/${subj}/mri
 
 # ----- CNR ----- #
-${FREESURFER_HOME}/bin/mri_cnr ${surfDir} ${mriDir}/orig.mgz > ${OutDir}/cnr.txt
+#${FREESURFER_HOME}/bin/
+mri_cnr ${surfDir} ${mriDir}/orig.mgz > ${OutDir}/cnr.txt
 total=`grep "total CNR" ${OutDir}/cnr.txt | cut -f 4 -d " "`
 cnr=`grep "gray/white CNR" ${OutDir}/cnr.txt`
 cnr_graycsf_lh=`echo $cnr | cut -d "," -f 2 | cut -d "=" -f 2 | cut -d " " -f 2`
@@ -86,7 +88,7 @@ cnr_graywhite_rh=`echo $cnr | cut -d "," -f 2 | cut -d "=" -f 3 | cut -d " " -f 
 #${FREESURFER_HOME}/mris_euler_number ${surfDir}/lh.orig.nofix > ${OutDir}/out_lh.txt
 #holes_lh=`grep " " ${OutDir}/euler_lh.txt | sed -e 's/^[[:space:]]*//'`
 
-script -c "${FREESURFER_HOME}/bin/mris_euler_number ${surfDir}/lh.orig.nofix" ${OutDir}/out_lh.txt
+script -c "mris_euler_number ${surfDir}/lh.orig.nofix" ${OutDir}/out_lh.txt
 holes_lh=`cat ${OutDir}/out_lh.txt | grep "euler" | cut -d ">" -f 2 | cut -d "h" -f 1 | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//'`
 euler_lh=`cat ${OutDir}/out_lh.txt | grep "euler" | cut -d "=" -f 4 | cut -d " " -f 2`
 
@@ -106,11 +108,9 @@ rm ${OutDir}/cnr.txt
 rm ${OutDir}/out_lh.txt
 rm ${OutDir}/out_rh.txt
 
-#############################################################
-#############################################################
-#############################################################
-
 # Quantify regional values
+${FLYWHEEL_BASE}/stats2table_bash.sh
+
 
 #############################################################
 #############################################################
