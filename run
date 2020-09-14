@@ -47,7 +47,7 @@ unzip ${INPUT_DIR}/fmriprepdir/*.zip
 ##################### PROCESSING STEPS #####################
 #############################################################
 
-mv ${FLYWHEEL_BASE}/license.txt ${FREESURFER_HOME}/
+cp ${FLYWHEEL_BASE}/license.txt ${FREESURFER_HOME}/
 export SUBJECTS_DIR=$FREESURFER_HOME/subjects
 FUNCTIONALS_DIR=$FREESURFER_HOME/sessions
 source $FREESURFER_HOME/FreeSurferEnv.sh
@@ -109,7 +109,7 @@ rm ${OutDir}/out_lh.txt
 rm ${OutDir}/out_rh.txt
 
 # Quantify regional values
-${FLYWHEEL_BASE}/stats2table_bash.sh
+${FLYWHEEL_BASE}/stats2table_bash.sh ${subj} ${session_label}
 
 
 #############################################################

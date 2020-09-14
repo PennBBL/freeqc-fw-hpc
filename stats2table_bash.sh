@@ -27,9 +27,6 @@ export SUBJECTS_DIR=$PWD
 python2 ${FREESURFER_HOME}/bin/asegstats2table --subjects ${subj} --delimiter comma --meas volume --skip --statsfile wmparc.stats --all-segs --tablefile /flywheel/v0/output/${subj}_${session_label}_wmparc_stats.csv
 python2 ${FREESURFER_HOME}/bin/asegstats2table --subjects ${subj} --delimiter comma --meas volume --skip --tablefile /flywheel/v0/output/${subj}_${session_label}_aseg_stats.csv
 python2 ${FREESURFER_HOME}/bin/aparcstats2table --subjects ${subj} --delimiter comma --hemi lh --meas volume --skip --tablefile /flywheel/v0/output/${subj}_${session_label}_aparc_volume_lh.csv
-#python2 ${FREESURFER_HOME}/bin/asegstats2table --subjects ${subj} --meas volume --skip --statsfile wmparc.stats --all-segs --tablefile wmparc_stats.csv
-
-
 python2 ${FREESURFER_HOME}/bin/aparcstats2table --subjects ${subj} --delimiter comma --hemi lh --meas thickness --skip --tablefile /flywheel/v0/output/${subj}_${session_label}_aparc_thickness_lh.csv
 python2 ${FREESURFER_HOME}/bin/aparcstats2table --subjects ${subj} --delimiter comma --hemi lh --meas area --skip --tablefile /flywheel/v0/output/${subj}_${session_label}_aparc_area_lh.csv
 python2 ${FREESURFER_HOME}/bin/aparcstats2table --subjects ${subj} --delimiter comma --hemi lh --meas meancurv --skip --tablefile /flywheel/v0/output/${subj}_${session_label}_aparc_meancurv_lh.csv
@@ -45,11 +42,22 @@ python2 ${FREESURFER_HOME}/bin/aparcstats2table --subjects ${subj} --delimiter c
 python2 ${FREESURFER_HOME}/bin/aparcstats2table --subjects ${subj} --delimiter comma --hemi rh --parc aparc.a2009s --meas thickness --skip -t /flywheel/v0/output/${subj}_${session_label}_rh_a2009s_thickness.csv
 python2 ${FREESURFER_HOME}/bin/aparcstats2table --subjects ${subj} --delimiter comma --hemi rh --parc aparc.a2009s --meas area --skip -t /flywheel/v0/output/${subj}_${session_label}_rh_a2009s_area.csv
 python2 ${FREESURFER_HOME}/bin/aparcstats2table --subjects ${subj} --delimiter comma --hemi rh --parc aparc.a2009s --meas meancurv --skip -t /flywheel/v0/output/${subj}_${session_label}_rh_a2009s_meancurv.csv
-python2 ${FREESURFER_HOME}/bin/aparcstats2table --subjects ${subj} --delimiter comma --hemi lh --parc BA --meas volume --skip -t /flywheel/v0/output/${subj}_${session_label}_lh_BA_volume.csv
-python2 ${FREESURFER_HOME}/bin/aparcstats2table --subjects ${subj} --delimiter comma --hemi lh --parc BA --meas thickness --skip -t /flywheel/v0/output/${subj}_${session_label}_lh_BA_thickness.csv
-python2 ${FREESURFER_HOME}/bin/aparcstats2table --subjects ${subj} --delimiter comma --hemi lh --parc BA --meas area --skip -t /flywheel/v0/output/${subj}_${session_label}_lh_BA_area.csv
-python2 ${FREESURFER_HOME}/bin/aparcstats2table --subjects ${subj} --delimiter comma --hemi lh --parc BA --meas meancurv --skip -t /flywheel/v0/output/${subj}_${session_label}_lh_BA_meancurv.csv
-python2 ${FREESURFER_HOME}/bin/aparcstats2table --subjects ${subj} --delimiter comma --hemi rh --parc BA --meas volume --skip -t /flywheel/v0/output/${subj}_${session_label}_rh_BA_volume.csv
-python2 ${FREESURFER_HOME}/bin/aparcstats2table --subjects ${subj} --delimiter comma --hemi rh --parc BA --meas thickness --skip -t /flywheel/v0/output/${subj}_${session_label}_rh_BA_thickness.csv
-python2 ${FREESURFER_HOME}/bin/aparcstats2table --subjects ${subj} --delimiter comma --hemi rh --parc BA --meas area --skip -t /flywheel/v0/output/${subj}_${session_label}_rh_BA_area.csv
-python2 ${FREESURFER_HOME}/bin/aparcstats2table --subjects ${subj} --delimiter comma --hemi rh --parc BA --meas meancurv --skip -t /flywheel/v0/output/${subj}_${session_label}_rh_BA_meancurv.csv
+
+# DKT Atlas
+python2 ${FREESURFER_HOME}/bin/aparcstats2table --subjects ${subj} --delimiter comma --hemi lh --parc aparc.DKTatlas --meas volume --skip -t /flywheel/v0/output/${subj}_${session_label}_lh_DKTatlas_volume.csv
+python2 ${FREESURFER_HOME}/bin/aparcstats2table --subjects ${subj} --delimiter comma --hemi lh --parc aparc.DKTatlas --meas thickness --skip -t /flywheel/v0/output/${subj}_${session_label}_lh_DKTatlas_thickness.csv
+python2 ${FREESURFER_HOME}/bin/aparcstats2table --subjects ${subj} --delimiter comma --hemi lh --parc aparc.DKTatlas --meas area --skip -t /flywheel/v0/output/${subj}_${session_label}_lh_DKTatlas_area.csv
+python2 ${FREESURFER_HOME}/bin/aparcstats2table --subjects ${subj} --delimiter comma --hemi lh --parc aparc.DKTatlas --meas meancurv --skip -t /flywheel/v0/output/${subj}_${session_label}_lh_DKTatlas_meancurv.csv
+python2 ${FREESURFER_HOME}/bin/aparcstats2table --subjects ${subj} --delimiter comma --hemi rh --parc aparc.DKTatlas --meas volume --skip -t /flywheel/v0/output/${subj}_${session_label}_rh_DKTatlas_volume.csv
+python2 ${FREESURFER_HOME}/bin/aparcstats2table --subjects ${subj} --delimiter comma --hemi rh --parc aparc.DKTatlas --meas thickness --skip -t /flywheel/v0/output/${subj}_${session_label}_rh_DKTatlas_thickness.csv
+python2 ${FREESURFER_HOME}/bin/aparcstats2table --subjects ${subj} --delimiter comma --hemi rh --parc aparc.DKTatlas --meas area --skip -t /flywheel/v0/output/${subj}_${session_label}_rh_DKTatlas_area.csv
+python2 ${FREESURFER_HOME}/bin/aparcstats2table --subjects ${subj} --delimiter comma --hemi rh --parc aparc.DKTatlas --meas meancurv --skip -t /flywheel/v0/output/${subj}_${session_label}_rh_DKTatlas_meancurv.csv
+
+#python2 ${FREESURFER_HOME}/bin/aparcstats2table --subjects ${subj} --delimiter comma --hemi lh --parc BA --meas volume --skip -t /flywheel/v0/output/${subj}_${session_label}_lh_BA_volume.csv
+#python2 ${FREESURFER_HOME}/bin/aparcstats2table --subjects ${subj} --delimiter comma --hemi lh --parc BA --meas thickness --skip -t /flywheel/v0/output/${subj}_${session_label}_lh_BA_thickness.csv
+#python2 ${FREESURFER_HOME}/bin/aparcstats2table --subjects ${subj} --delimiter comma --hemi lh --parc BA --meas area --skip -t /flywheel/v0/output/${subj}_${session_label}_lh_BA_area.csv
+#python2 ${FREESURFER_HOME}/bin/aparcstats2table --subjects ${subj} --delimiter comma --hemi lh --parc BA --meas meancurv --skip -t /flywheel/v0/output/${subj}_${session_label}_lh_BA_meancurv.csv
+#python2 ${FREESURFER_HOME}/bin/aparcstats2table --subjects ${subj} --delimiter comma --hemi rh --parc BA --meas volume --skip -t /flywheel/v0/output/${subj}_${session_label}_rh_BA_volume.csv
+#python2 ${FREESURFER_HOME}/bin/aparcstats2table --subjects ${subj} --delimiter comma --hemi rh --parc BA --meas thickness --skip -t /flywheel/v0/output/${subj}_${session_label}_rh_BA_thickness.csv
+#python2 ${FREESURFER_HOME}/bin/aparcstats2table --subjects ${subj} --delimiter comma --hemi rh --parc BA --meas area --skip -t /flywheel/v0/output/${subj}_${session_label}_rh_BA_area.csv
+#python2 ${FREESURFER_HOME}/bin/aparcstats2table --subjects ${subj} --delimiter comma --hemi rh --parc BA --meas meancurv --skip -t /flywheel/v0/output/${subj}_${session_label}_rh_BA_meancurv.csv
