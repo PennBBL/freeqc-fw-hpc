@@ -5,7 +5,7 @@ CONFIG_FILE=$FLYWHEEL_BASE/config.json
 ANALYSIS_ID=$(jq -r '.destination.id' $CONFIG_FILE)
 INPUT_DIR=$FLYWHEEL_BASE/input
 GEAR_OUTPUT_DIR=$FLYWHEEL_BASE/output
-FREEQC_OUTPUT_DIR=$GEAR_OUTPUT_DIR/"$ANALYSIS_ID"
+FREEQC_OUTPUT_DIR=$GEAR_OUTPUT_DIR/"$ANALYSIS_ID" # Sept 15: I want this directory created, but I don't want the inputs in here
 WORKING_DIR=$GEAR_OUTPUT_DIR/"$ANALYSIS_ID"_work
 #BIDS_DIR=$GEAR_OUTPUT_DIR/bids_dataset
 #EXE_SCRIPT=$GEAR_OUTPUT_DIR/freeqc_run.sh
@@ -47,19 +47,22 @@ unzip ${INPUT_DIR}/fmriprepdir/*.zip
 ##################### PROCESSING STEPS #####################
 #############################################################
 
-cp ${FLYWHEEL_BASE}/license.txt ${FREESURFER_HOME}/
+license=`find ${FLYWHEEL_BASE} -name 'license.txt'`
+cp ${license} ${FREESURFER_HOME}/
 export SUBJECTS_DIR=$FREESURFER_HOME/subjects
 FUNCTIONALS_DIR=$FREESURFER_HOME/sessions
 source $FREESURFER_HOME/FreeSurferEnv.sh
 
+fmriprep_dir=`find ${INPUT_DIR}/ -type d -name "fmriprepdir"` #September 18, 2020: Debug line
+echo "This is the fmriprepdir: ${fmriprep_dir}"
+ls -ltr ${fmriprep_dir}
+
 ####### fMRIPrep outputs that pass QA #######
-# QA: Prior manual + Euler-based inspection for unchecked images
-# bblid,seslabel,cnr_graycsf_lh,cnr_graycsf_rh,cnr_graywhite_lh,cnr_graywhite_rh,euler_lh,euler_rh
-InDir=${INPUT_DIR}/fmriprepdir/*/freesurfer
-#~/Documents/flywheel/antssstbids_fw_debug/5ea767e021d44102f5600847/freesurfer
+#InDir=${INPUT_DIR}/fmriprepdir/*/freesurfer
+InDir=`find ${INPUT_DIR}/fmriprepdir/ -maxdepth 2 -type d -name "freesurfer"` # Sept 23: Maybe this will work for flywheel
+echo "${InDir}" #Debug line
+ls -ltr ${InDir} #Debug line
 OutDir=${GEAR_OUTPUT_DIR}
-#~/Documents/flywheel/freesurfer-quality-calc_fw_debug/output/data
-#mkdir ${OutDir}
 subj=`ls -d ${InDir}/sub* | sed 's#.*/##'`
 bblid=`echo ${subj} | cut -d "-" -f 2`
 seslabel=`echo ${session_label} | cut -d "-" -f 2`
@@ -67,7 +70,6 @@ surfDir=${InDir}/${subj}/surf ### MIGHT HAVE TO GIT RID OF DIRS BETWEEN INPUT AN
 mriDir=${InDir}/${subj}/mri
 
 # ----- CNR ----- #
-#${FREESURFER_HOME}/bin/
 mri_cnr ${surfDir} ${mriDir}/orig.mgz > ${OutDir}/cnr.txt
 total=`grep "total CNR" ${OutDir}/cnr.txt | cut -f 4 -d " "`
 cnr=`grep "gray/white CNR" ${OutDir}/cnr.txt`
@@ -77,17 +79,6 @@ cnr_graywhite_lh=`echo $cnr | cut -d "," -f 1 | cut -d "=" -f 2 | cut -d " " -f 
 cnr_graywhite_rh=`echo $cnr | cut -d "," -f 2 | cut -d "=" -f 3 | cut -d " " -f 2`
 
 # ---- Euler ---- #
-#${FREESURFER_HOME}/mris_euler_number -o ${OutDir}/euler_lh.txt ${surfDir}/lh.orig.nofix
-#out_lh=`${FREESURFER_HOME}/mris_euler_number -o ${OutDir}/euler_lh.txt ${surfDir}/lh.orig.nofix`
-#${FREESURFER_HOME}/mris_euler_number -o ${OutDir}/euler_lh.txt ${surfDir}/lh.orig.nofix | tee $out_lh
-#out_lh=$(${FREESURFER_HOME}/mris_euler_number -o ${OutDir}/euler_lh.txt ${surfDir}/lh.orig.nofix | tee /dev/tty)
-#out_lh=$(${FREESURFER_HOME}/mris_euler_number ${surfDir}/lh.orig.nofix)
-#${FREESURFER_HOME}/mris_euler_number ${surfDir}/lh.orig.nofix > ${OutDir}/out_lh.txt
-#out_lh=`${FREESURFER_HOME}/mris_euler_number ${surfDir}/lh.orig.nofix`
-#echo `${FREESURFER_HOME}/mris_euler_number ${surfDir}/lh.orig.nofix` > ${OutDir}/out_lh.txt
-#${FREESURFER_HOME}/mris_euler_number ${surfDir}/lh.orig.nofix > ${OutDir}/out_lh.txt
-#holes_lh=`grep " " ${OutDir}/euler_lh.txt | sed -e 's/^[[:space:]]*//'`
-
 script -c "mris_euler_number ${surfDir}/lh.orig.nofix" ${OutDir}/out_lh.txt
 holes_lh=`cat ${OutDir}/out_lh.txt | grep "euler" | cut -d ">" -f 2 | cut -d "h" -f 1 | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//'`
 euler_lh=`cat ${OutDir}/out_lh.txt | grep "euler" | cut -d "=" -f 4 | cut -d " " -f 2`
@@ -109,7 +100,10 @@ rm ${OutDir}/out_lh.txt
 rm ${OutDir}/out_rh.txt
 
 # Quantify regional values
-${FLYWHEEL_BASE}/stats2table_bash.sh ${subj} ${session_label}
+bash ${FLYWHEEL_BASE}/stats2table_bash.sh ${subj} ${session_label}
+
+# Put in bblid and seslabel columns
+python ${FLYWHEEL_BASE}/idcols.py
 
 
 #############################################################
@@ -118,13 +112,13 @@ ${FLYWHEEL_BASE}/stats2table_bash.sh ${subj} ${session_label}
 
 
 #if [[ $FREEQC_EXITSTATUS == 0 ]] ; then ### Some other check of outputs
-
   # Generate zipped output of freeqc
-  cd "$GEAR_OUTPUT_DIR" # September 3, 2020: Seems redundant
-  echo "$CONTAINER  generating zip archive from outputs..."
-  time zip -q -r "$GEAR_OUTPUT_DIR"/freeqc_"$SUB_ID"_"${session_label}"_"$ANALYSIS_ID" $(basename "$FREEQC_OUTPUT_DIR")
+cd "$GEAR_OUTPUT_DIR" # September 3, 2020: Seems redundant
+mv ./*.csv ${FREEQC_OUTPUT_DIR}
+echo "$CONTAINER  generating zip archive from outputs..."
+time zip -q -r "$GEAR_OUTPUT_DIR"/freeqc_"${subj}"_"${session_label}"_"${ANALYSIS_ID}" $(basename "$FREEQC_OUTPUT_DIR")
 
-  chmod -R 777 $GEAR_OUTPUT_DIR
+chmod -R 777 $GEAR_OUTPUT_DIR
 
 #if [[ $config_save_outputs == 'true' ]] ; then
 #  echo "$CONTAINER  Error occurred. Config 'save_outputs' set to true. Zipping up outputs."
@@ -136,11 +130,11 @@ ${FLYWHEEL_BASE}/stats2table_bash.sh ${subj} ${session_label}
   # COPY ANALYSIS TO PROJECT LEVEL IF MULTI-SESSION. Q: Why project level? And not subject?
   #   Use Python SDK to accomplish this task
 
-  /usr/local/miniconda/bin/python ${FLYWHEEL_BASE}/move_to_project.py
-  if [[ $? != 0 ]]; then
-    echo "$CONTAINER  Problem resolving multi-session structure! Exiting (1)"
-    exit 1
-  fi
+/usr/local/miniconda/bin/python ${FLYWHEEL_BASE}/move_to_project.py
+if [[ $? != 0 ]]; then
+  echo "$CONTAINER  Problem resolving multi-session structure! Exiting (1)"
+  exit 1
+fi
 
 #else
 #  echo "$CONTAINER  Errors encountered during execution. Save outputs config not set. Cleaning up and exiting."

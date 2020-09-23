@@ -17,10 +17,11 @@ fw = flywheel.Client(api_key)
 project = fw.projects.find_first('label=ExtraLong')
 
 # Get the analysis ID for the fmriprep run
-fmriprep_input = os.listdir('/flywheel/v0/input/fmriprepdir/')
+#fmriprep_input = os.listdir('/flywheel/v0/input/fmriprepdir/')
 #fmriprep_input = os.listdir('/Users/butellyn/Documents/freeqc-fw-hpc/freeqc-fw-hpc-latest_5f4005f27f9b26471ab88637/input/fmriprepdir')
 #analysis_id = fmriprep_input[1].split('_')[2].split('.')[0]
-analysis_id = fmriprep_input[0]
+#analysis_id = fmriprep_input[0]
+analysis_id = config_file['inputs']['fmriprepdir']['hierarchy']['id']
 
 # Get the analysis object
 analysis_obj = fw.get(analysis_id)

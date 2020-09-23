@@ -1,8 +1,8 @@
 {
 	"name": "freeqc-fw-hpc",
-	"label": "freeqc-fw-hpc: ",
-	"description": "Calculates surface holes, Euler's number, and CNR using freesurfer output from fMRIPrep [CUBIC]",
-	"version": "0.0.1_6.0.1",
+	"label": "freeqc-fw-hpc: Freesurfer quality and segmentation values",
+	"description": "Calculates quality metrics and structural values using freesurfer output from fMRIPrep [CUBIC]",
+	"version": "0.0.4_6.0.1",
   "custom": {
 		"gear-builder": {
 			"category": "analysis",
@@ -26,7 +26,7 @@
 		},
 			"freesurfer_license": {
 				"base": "file",
-				"description": "FreeSurfer license file, provided during registration with FreeSurfer. This file will by copied to the $FSHOME directory and used during execution of the Gear.",
+				"description": "FreeSurfer license file, provided during registration with FreeSurfer. This file will be copied to the $FSHOME directory and used during execution of the Gear.",
 				"optional": false
 			}
 	},

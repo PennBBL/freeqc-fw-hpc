@@ -100,10 +100,12 @@ ENTRYPOINT ["/flywheel/v0/run"]
 # Copy over python scripts that generate the BIDS hierarchy
 #COPY prepare_run.py /flywheel/v0/prepare_run.py # August 19, 2020: This is probably obsolete, since the entire pipeline is in the run script
 #COPY create_archive_fw_heudiconv.py /flywheel/v0/create_archive_fw_heudiconv.py
+#COPY download_freesurfer_output.py /flywheel/v0/download_freesurfer_output.py
+
 COPY move_to_project.py /flywheel/v0/move_to_project.py
 COPY get_seslabel.py /flywheel/v0/get_seslabel.py
-#COPY download_freesurfer_output.py /flywheel/v0/download_freesurfer_output.py
 COPY stats2table_bash.sh /flywheel/v0/stats2table_bash.sh
+COPY idcols.py /flywheel/v0/idcols.py
 RUN chmod +x ${FLYWHEEL}/*
 
 RUN pip install fw-heudiconv -U
