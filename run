@@ -4,14 +4,23 @@ MANIFEST_FILE=$FLYWHEEL_BASE/manifest.json
 CONFIG_FILE=$FLYWHEEL_BASE/config.json
 ANALYSIS_ID=$(jq -r '.destination.id' $CONFIG_FILE)
 INPUT_DIR=$FLYWHEEL_BASE/input
-GEAR_OUTPUT_DIR=$FLYWHEEL_BASE/output
-FREEQC_OUTPUT_DIR=$GEAR_OUTPUT_DIR/"$ANALYSIS_ID" # Sept 15: I want this directory created, but I don't want the inputs in here
-WORKING_DIR=$GEAR_OUTPUT_DIR/"$ANALYSIS_ID"_work
-#BIDS_DIR=$GEAR_OUTPUT_DIR/bids_dataset
-#EXE_SCRIPT=$GEAR_OUTPUT_DIR/freeqc_run.sh
+OUTPUT_DIR=$FLYWHEEL_BASE/output
+FREEQC_OUTPUT_DIR=$OUTPUT_DIR/"$ANALYSIS_ID" # Sept 15: I want this directory created, but I don't want the inputs in here
+WORKING_DIR=$OUTPUT_DIR/"$ANALYSIS_ID"_work
+#BIDS_DIR=$OUTPUT_DIR/bids_dataset
+#EXE_SCRIPT=$OUTPUT_DIR/freeqc_run.sh
 CONTAINER='[flywheel/freeqc-fw-hpc]'
 
 #https://github.com/PennBBL/rewardAnalysisReprocScripts/blob/master/freesurfer/cnrEulerCalc.sh
+
+echo "Below is the contents of the flywheel base" #Debug
+ls -ltr ${FLYWHEEL_BASE} #Debug
+
+echo "Below is the contents of the input directory" #Debug
+ls -ltr ${INPUT_DIR} #Debug
+
+echo "Below is the contents of the output directory" #Debug
+ls -ltr ${OUTPUT_DIR} #Debug
 
 # CRITICAL: re-create the environment
 cat ${FLYWHEEL_BASE}/docker-env.sh
@@ -41,7 +50,8 @@ session_label=`python ${FLYWHEEL_BASE}/get_seslabel.py`
 #echo -e "$CONTAINER END FREEQC DOCKERFILE \n"
 
 # Unzip fmriprep output
-unzip ${INPUT_DIR}/fmriprepdir/*.zip
+#unzip ${INPUT_DIR}/fmriprepdir/*.zip
+unzip ${INPUT_DIR}/fmriprepdir/*.zip -d ${FLYWHEEL_BASE}
 
 #############################################################
 ##################### PROCESSING STEPS #####################
@@ -53,16 +63,14 @@ export SUBJECTS_DIR=$FREESURFER_HOME/subjects
 FUNCTIONALS_DIR=$FREESURFER_HOME/sessions
 source $FREESURFER_HOME/FreeSurferEnv.sh
 
-fmriprep_dir=`find ${INPUT_DIR}/ -type d -name "fmriprepdir"` #September 18, 2020: Debug line
-echo "This is the fmriprepdir: ${fmriprep_dir}"
-ls -ltr ${fmriprep_dir}
+freesurfer_dir=`find ${FLYWHEEL_BASE}/ -type d -name "freesurfer"` #September 18, 2020: Debug line
+echo "This is the freesurfer directory: ${freesurfer_dir}"
+ls -ltr ${freesurfer_dir}
 
 ####### fMRIPrep outputs that pass QA #######
 #InDir=${INPUT_DIR}/fmriprepdir/*/freesurfer
-InDir=`find ${INPUT_DIR}/fmriprepdir/ -maxdepth 2 -type d -name "freesurfer"` # Sept 23: Maybe this will work for flywheel
-echo "${InDir}" #Debug line
-ls -ltr ${InDir} #Debug line
-OutDir=${GEAR_OUTPUT_DIR}
+InDir=${freesurfer_dir}
+OutDir=${OUTPUT_DIR}
 subj=`ls -d ${InDir}/sub* | sed 's#.*/##'`
 bblid=`echo ${subj} | cut -d "-" -f 2`
 seslabel=`echo ${session_label} | cut -d "-" -f 2`
@@ -105,6 +113,16 @@ bash ${FLYWHEEL_BASE}/stats2table_bash.sh ${subj} ${session_label}
 # Put in bblid and seslabel columns
 python ${FLYWHEEL_BASE}/idcols.py
 
+qualcsv=`find ${OutDir} -name "*qual*.csv"`
+dktcsv=`find ${OutDir} -name "*rh_DKTatlas_volume.csv"`
+if [[ ! -f "${qualcsv}" ]] ; then
+  echo "Quality csv does not exist"
+  exit 1
+fi
+if [[ ! -f "${dktcsv}" ]] ; then
+  echo "DKT csv does not exist"
+  exit 1
+fi
 
 #############################################################
 #############################################################
@@ -113,19 +131,21 @@ python ${FLYWHEEL_BASE}/idcols.py
 
 #if [[ $FREEQC_EXITSTATUS == 0 ]] ; then ### Some other check of outputs
   # Generate zipped output of freeqc
-cd "$GEAR_OUTPUT_DIR" # September 3, 2020: Seems redundant
-mv ./*.csv ${FREEQC_OUTPUT_DIR}
+cd "$OUTPUT_DIR" # September 3, 2020: Seems redundant
 echo "$CONTAINER  generating zip archive from outputs..."
-time zip -q -r "$GEAR_OUTPUT_DIR"/freeqc_"${subj}"_"${session_label}"_"${ANALYSIS_ID}" $(basename "$FREEQC_OUTPUT_DIR")
+mkdir "$OUTPUT_DIR"/freeqc_"${subj}"_"${session_label}"_"${ANALYSIS_ID}"
+FREEQC_OUTPUT_DIR="$OUTPUT_DIR"/freeqc_"${subj}"_"${session_label}"_"${ANALYSIS_ID}"
+mv ${OutDir}/*.csv ${FREEQC_OUTPUT_DIR}
+time zip -q -r "$OUTPUT_DIR"/freeqc_"${subj}"_"${session_label}"_"${ANALYSIS_ID}" $(basename "$FREEQC_OUTPUT_DIR")
 
-chmod -R 777 $GEAR_OUTPUT_DIR
+chmod -R 777 $OUTPUT_DIR
 
 #if [[ $config_save_outputs == 'true' ]] ; then
 #  echo "$CONTAINER  Error occurred. Config 'save_outputs' set to true. Zipping up outputs."
-#  cd "$GEAR_OUTPUT_DIR"
-#  time zip -q -r "$GEAR_OUTPUT_DIR"/debug_freeqc_"$ANALYSIS_ID"  $(basename "$FREEQC_OUTPUT_DIR")
-#  time zip -q -r "$GEAR_OUTPUT_DIR"/debug_freeqc_work_"$ANALYSIS_ID" $(basename "$WORKING_DIR")
-#  chmod -R 777 $GEAR_OUTPUT_DIR
+#  cd "$OUTPUT_DIR"
+#  time zip -q -r "$OUTPUT_DIR"/debug_freeqc_"$ANALYSIS_ID"  $(basename "$FREEQC_OUTPUT_DIR")
+#  time zip -q -r "$OUTPUT_DIR"/debug_freeqc_work_"$ANALYSIS_ID" $(basename "$WORKING_DIR")
+#  chmod -R 777 $OUTPUT_DIR
 
   # COPY ANALYSIS TO PROJECT LEVEL IF MULTI-SESSION. Q: Why project level? And not subject?
   #   Use Python SDK to accomplish this task
@@ -144,6 +164,6 @@ fi
 rm -rf "$WORKING_DIR"
 rm -rf "$FREEQC_OUTPUT_DIR"
 
-echo -e "Wrote: `ls -lh $GEAR_OUTPUT_DIR`"
+echo -e "Wrote: `ls -lh $OUTPUT_DIR`"
 
 #exit $FREEQC_EXITSTATUS

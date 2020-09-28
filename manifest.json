@@ -2,7 +2,7 @@
 	"name": "freeqc-fw-hpc",
 	"label": "freeqc-fw-hpc: Freesurfer quality and segmentation values",
 	"description": "Calculates quality metrics and structural values using freesurfer output from fMRIPrep [CUBIC]",
-	"version": "0.0.4_6.0.1",
+	"version": "0.0.6_6.0.1",
   "custom": {
 		"gear-builder": {
 			"category": "analysis",

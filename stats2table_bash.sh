@@ -16,11 +16,10 @@ session_label=$2
 #export FREESURFER_HOME=/opt/freesurfer
 #sleep 1
 
-INPUT_DIR=/flywheel/v0/input
 #SUBJECTS_DIR=${FREESURFER_HOME}/subjects
 #InDir=`find ${INPUT_DIR}/fmriprepdir/*/freesurfer/sub-*/ -name 'stats'`
 
-cd ${INPUT_DIR}/fmriprepdir/*/freesurfer/
+cd /flywheel/v0/*/freesurfer/
 export SUBJECTS_DIR=$PWD
 #subj=`ls -d ./sub* | cut -d '/' -f 2`
 #asegstats2table -i ${InDir}/wmparc.stats --delimiter comma --meas volume --skip --all-segs --tablefile wmparc_stats.csv
